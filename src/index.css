@@ -1,0 +1,10 @@
+svg {
+    margin: none;
+    padding: 2px;
+    border: 2px solid #ccc;
+}
+
+#svg-palette {
+    width: 368px;
+    height: 128px;
+}
