@@ -6,6 +6,7 @@
   "scripts": {
     "build": "webpack",
     "build-prod": "webpack --config prod.config.js",
+    "build-debug": "webpack --config prod-debug.config.js",
     "start": "webpack serve --open",
     "deploy": "gh-pages -d dist"
   },
