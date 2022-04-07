@@ -225,5 +225,34 @@ export default class PietUI {
       });
     });
     writeButton.trigger('click');
+
+    this.export = {
+      pngButton: $('#export-png'),
+      svgButton: $('#export-svg'),
+      updateExportLink: () => {
+        const { rows, cols } = this.code;
+        const matrix = this.code.code;
+        const canvas = $('<canvas/>');
+        canvas.prop({ width: cols, height: rows });
+        const canvasEl = canvas.get(0);
+        const ctx = canvasEl.getContext('2d');
+        const imdata = ctx.getImageData(0, 0, cols, rows);
+        for (let r = 0; r < rows; r += 1) {
+          for (let c = 0; c < cols; c += 1) {
+            const idx = (r * cols + c) * 4;
+            const { colorvec } = Piet.colors[matrix[r][c]];
+            for (let i = 0; i < 4; i += 1) {
+              imdata.data[idx + i] = colorvec[i];
+            }
+          }
+        }
+        ctx.putImageData(imdata, 0, 0);
+        const url = canvasEl.toDataURL('image/png');
+        this.export.pngButton.prop({ href: url });
+      },
+    };
+    $('#nav-share-tab').on('click', () => {
+      this.export.updateExportLink();
+    });
   }
 }

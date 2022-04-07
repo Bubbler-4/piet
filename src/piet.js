@@ -19,11 +19,15 @@ export default class Piet {
       for (let hue = 0; hue < 6; hue += 1) {
         const charcode = darkness * 32 + hue + 48;
         let colorcode = '#';
+        const colorvec = [];
         for (let i = 0; i < 3; i += 1) {
-          colorcode += light[(hueMask[hue] >> (2 - i)) & 1];
+          const nextVal = light[(hueMask[hue] >> (2 - i)) & 1];
+          colorcode += nextVal;
+          colorvec.push(Number.parseInt(nextVal, 16));
         }
+        colorvec.push(255);
         const char = String.fromCharCode(charcode);
-        this.colors.push({ charcode, char, colorcode });
+        this.colors.push({ charcode, char, colorcode, colorvec });
         this.char2color[char] = darkness * 6 + hue;
       }
     }

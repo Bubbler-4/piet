@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "build": "webpack",
+    "build-prod": "webpack --config prod.config.js",
     "start": "webpack serve --open",
     "deploy": "gh-pages -d dist"
   },

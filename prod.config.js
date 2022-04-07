@@ -8,7 +8,7 @@ module.exports = {
   output: {
     filename: '[name].[contenthash].bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    // publicPath: '/piet/',
+    publicPath: '/piet/',
     clean: true,
   },
   plugins: [
@@ -62,6 +62,6 @@ module.exports = {
   devServer: {
     static: './dist',
   },
-  mode: 'development',
-  devtool: 'eval-source-map',
+  mode: 'production',
+  // devtool: 'eval-source-map',
 };
