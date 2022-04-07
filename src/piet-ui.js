@@ -247,8 +247,18 @@ export default class PietUI {
           }
         }
         ctx.putImageData(imdata, 0, 0);
-        const url = canvasEl.toDataURL('image/png');
-        this.export.pngButton.prop({ href: url });
+        canvasEl.toBlob(blob => {
+          const pngUrl = URL.createObjectURL(blob);
+          this.export.pngButton.prop({ href: pngUrl });
+        });
+        // const pngUrl = canvasEl.toDataURL('image/png');
+        // this.export.pngButton.prop({ href: pngUrl });
+        const svgStr = this.codeSvg
+          .outerSVG()
+          .replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+        const svgBlob = new Blob([svgStr]);
+        const svgUrl = URL.createObjectURL(svgBlob);
+        this.export.svgButton.prop({ href: svgUrl });
       },
     };
     $('#nav-share-tab').on('click', () => {
