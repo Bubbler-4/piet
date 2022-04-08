@@ -63,5 +63,5 @@ module.exports = {
     static: './dist',
   },
   mode: 'development',
-  devtool: 'eval-source-map',
+  devtool: 'inline-source-map',
 };

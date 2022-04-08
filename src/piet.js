@@ -35,12 +35,14 @@ export default class Piet {
       charcode: '@'.charCodeAt(),
       char: '@',
       colorcode: '#FFFFFF',
+      colorvec: [255, 255, 255, 255],
     });
     this.char2color['@'] = 18;
     this.colors.push({
       charcode: ' '.charCodeAt(),
       char: ' ',
       colorcode: '#000000',
+      colorvec: [0, 0, 0, 255],
     });
     this.char2color[' '] = 19;
   }
