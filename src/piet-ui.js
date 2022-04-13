@@ -67,33 +67,41 @@ export default class PietUI {
       .toDefs();
     this.codeRects = [[]];
     this.codeRects.update = () => {
-      const prevRows = this.codeRects.length;
-      const prevCols = this.codeRects[0].length;
-      if (prevRows < this.code.rows) {
-        const newRow = this.code.code[this.code.rows - 1].map((color, c) => {
+      let prevRows = this.codeRects.length;
+      let prevCols = this.codeRects[0].length;
+      while (prevCols < this.code.cols) {
+        const c = prevCols;
+        this.codeRects.forEach((row, r) => {
+          const newRect = this.codeSvg.use(codeRect);
+          newRect.attr({
+            x: 30 * c,
+            y: 30 * r,
+            fill: Piet.colors[this.code.code[r][c]].colorcode,
+          });
+          row.push(newRect);
+        });
+        prevCols += 1;
+      }
+      while (prevCols > this.code.cols) {
+        this.codeRects.forEach(row => row.pop().remove());
+        prevCols -= 1;
+      }
+      while (prevRows < this.code.rows) {
+        const r = prevRows;
+        const newRow = this.code.code[r].map((color, c) => {
           const curRect = this.codeSvg.use(codeRect);
           return curRect.attr({
             x: 30 * c,
-            y: 30 * (this.code.rows - 1),
+            y: 30 * r,
             fill: Piet.colors[color].colorcode,
           });
         });
         this.codeRects.push(newRow);
-      } else if (prevRows > this.code.rows) {
-        this.codeRects.pop().forEach(rect => rect.remove());
+        prevRows += 1;
       }
-      if (prevCols < this.code.cols) {
-        this.codeRects.forEach((row, r) => {
-          const newRect = this.codeSvg.use(codeRect);
-          newRect.attr({
-            x: 30 * (this.code.cols - 1),
-            y: 30 * r,
-            fill: Piet.colors[this.code.code[r][this.code.cols - 1]].colorcode,
-          });
-          row.push(newRect);
-        });
-      } else if (prevCols > this.code.cols) {
-        this.codeRects.forEach(row => row.pop().remove());
+      while (prevRows > this.code.rows) {
+        this.codeRects.pop().forEach(rect => rect.remove());
+        prevRows -= 1;
       }
       this.codeRects.forEach((row, r) => {
         row.forEach((rect, c) => {
@@ -263,6 +271,51 @@ export default class PietUI {
     };
     $('#nav-share-tab').on('click', () => {
       this.export.updateExportLink();
+    });
+
+    this.import = {
+      fileButton: $('#import-file'),
+      fileInputButton: $('#import-file-input'),
+      asciiButton: $('#import-ascii'),
+    };
+    this.import.fileButton.on('click', () =>
+      this.import.fileInputButton.trigger('click'),
+    );
+    this.import.fileInputButton.on('change', e => {
+      const file = e.target.files[0];
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        let width = img.naturalWidth;
+        let height = img.naturalHeight;
+        const canvas = $('<canvas/>');
+        canvas.prop({ width, height });
+        const canvasEl = canvas.get(0);
+        const ctx = canvasEl.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const imdata = ctx.getImageData(0, 0, width, height);
+        const codeGrid = [];
+        if (width === 0 || height === 0) {
+          codeGrid.push([19]); // fallback to single black cell
+          width = 1;
+          height = 1;
+        } else {
+          for (let r = 0; r < height; r += 1) {
+            codeGrid.push([]);
+            for (let c = 0; c < width; c += 1) {
+              const idx = r * width * 4 + c * 4;
+              const color =
+                Piet.colorvec2color[imdata.data.slice(idx, idx + 4)] ?? 19;
+              codeGrid[r].push(color);
+            }
+          }
+        }
+        const codeGrid2 = Piet.compress(codeGrid, width, height);
+        this.code.replaceCode(codeGrid2);
+        this.codeRects.update();
+      };
+      img.src = url;
     });
 
     $('#nav-debug-tab').on('click', () => {

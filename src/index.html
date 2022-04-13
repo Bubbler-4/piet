@@ -25,7 +25,7 @@
               <button class="nav-link active" id="nav-edit-tab" data-bs-toggle="tab" data-bs-target="#nav-edit" type="button" role="tab" aria-controls="nav-edit" aria-selected="true">Edit</button>
               <button class="nav-link" id="nav-debug-tab" data-bs-toggle="tab" data-bs-target="#nav-debug" type="button" role="tab" aria-controls="nav-debug" aria-selected="false">Debug</button>
               <button class="nav-link" id="nav-test-tab" data-bs-toggle="tab" data-bs-target="#nav-test" type="button" role="tab" aria-controls="nav-test" aria-selected="false">Test</button>
-              <button class="nav-link" id="nav-share-tab" data-bs-toggle="tab" data-bs-target="#nav-share" type="button" role="tab" aria-controls="nav-share" aria-selected="false">Share</button>
+              <button class="nav-link" id="nav-share-tab" data-bs-toggle="tab" data-bs-target="#nav-share" type="button" role="tab" aria-controls="nav-share" aria-selected="false">Import/Export/Share</button>
             </div>
           </nav>
           <div class="tab-content" id="nav-tabContent">
@@ -90,6 +90,18 @@
             <div class="tab-pane fade" id="nav-test" role="tabpanel" aria-labelledby="nav-test-tab">Test content</div>
             <div class="tab-pane fade" id="nav-share" role="tabpanel" aria-labelledby="nav-share-tab">
               <div class="row">
+                <div class="col-12">
+                  <h5>Import from Image</h5>
+                  <div class="btn-group" role="group" aria-label="Import from image">
+                    <a href="#" class="btn btn-outline-primary" id="import-file">Open file</a>
+                    <a href="#" class="btn btn-outline-primary" id="import-ascii">From ascii-piet</a>
+                  </div>
+                  <input id="import-file-input" type="file" style="display:none;" />
+                  <div class="mt-3 mb-3">
+                    <label for="import-ascii-content" class="form-label">ascii-piet code</label>
+                    <textarea class="form-control" id="import-ascii-content" rows="3"></textarea>
+                  </div>
+                </div>
                 <div class="col-12">
                   <h5>Export as Image</h5>
                 </div>

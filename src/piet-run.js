@@ -110,7 +110,7 @@ export default class PietRun {
           const [top2, top] = self.stack.splice(-2);
           if (top2 >= 0n && self.stack.length >= Number(top2)) {
             const rot = divmod(-top, top2)[1];
-            const removed = self.stack.splice(-Number(top2), rot);
+            const removed = self.stack.splice(-Number(top2), Number(rot));
             self.stack.push(...removed);
           } else {
             self.stack.push(top2, top);

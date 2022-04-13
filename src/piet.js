@@ -7,6 +7,7 @@ export default class Piet {
 
   static {
     this.char2color = {};
+    this.colorvec2color = {};
     this.colors = [];
     const hueMask = [4, 6, 2, 3, 1, 5];
     const lightStr = [
@@ -29,6 +30,7 @@ export default class Piet {
         const char = String.fromCharCode(charcode);
         this.colors.push({ charcode, char, colorcode, colorvec });
         this.char2color[char] = darkness * 6 + hue;
+        this.colorvec2color[colorvec] = darkness * 6 + hue;
       }
     }
     this.colors.push({
@@ -38,6 +40,7 @@ export default class Piet {
       colorvec: [255, 255, 255, 255],
     });
     this.char2color['@'] = 18;
+    this.colorvec2color[this.colors[18].colorvec] = 18;
     this.colors.push({
       charcode: ' '.charCodeAt(),
       char: ' ',
@@ -45,6 +48,47 @@ export default class Piet {
       colorvec: [0, 0, 0, 255],
     });
     this.char2color[' '] = 19;
+    this.colorvec2color[this.colors[19].colorvec] = 19;
+  }
+
+  static compress(codeGrid, width, height) {
+    function gcd(a, b) {
+      let [x, y] = [a, b];
+      while (y !== 0) {
+        [x, y] = [y, x % y];
+      }
+      return x;
+    }
+    const g = gcd(width, height);
+    function check(s) {
+      for (let r = 0; r < height / s; r += 1) {
+        for (let c = 0; c < width / s; c += 1) {
+          const rmin = r * s;
+          const rmax = (r + 1) * s;
+          const cmin = c * s;
+          const cmax = (c + 1) * s;
+          const expected = codeGrid[rmin][cmin];
+          for (let rr = rmin; rr < rmax; rr += 1) {
+            for (let cc = cmin; cc < cmax; cc += 1) {
+              if (expected !== codeGrid[rr][cc]) {
+                return false;
+              }
+            }
+          }
+        }
+      }
+      return true;
+    }
+    for (let gg = g; gg >= 1; gg -= 1) {
+      if (g % gg === 0) {
+        if (check(gg)) {
+          return codeGrid
+            .filter((r, i) => i % gg === 0)
+            .map(row => row.filter((c, i) => i % gg === 0));
+        }
+      }
+    }
+    return codeGrid;
   }
 
   constructor(code) {
@@ -99,5 +143,11 @@ export default class Piet {
       this.code.shift();
       this.rows -= 1;
     }
+  }
+
+  replaceCode(newCode) {
+    this.code = newCode;
+    this.rows = this.code.length;
+    this.cols = this.code[0].length;
   }
 }
