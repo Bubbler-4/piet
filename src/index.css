@@ -8,3 +8,9 @@ svg {
     width: 368px;
     height: 128px;
 }
+
+textarea {
+    resize: none;
+    font-family: monospace;
+    white-space: pre;
+}

@@ -58,7 +58,35 @@
                 </div>
               </div>
             </div>
-            <div class="tab-pane fade" id="nav-debug" role="tabpanel" aria-labelledby="nav-debug-tab">Debug content</div>
+            <div class="tab-pane fade" id="nav-debug" role="tabpanel" aria-labelledby="nav-debug-tab">
+              <div class="row">
+                <div class="col-12">
+                  <div class="btn-group mb-3" role="group" aria-label="Debug control">
+                    <button type="button" class="btn btn-outline-primary" id="debug-start">Start</button>
+                    <button type="button" class="btn btn-outline-primary" id="debug-step" disabled>Step</button>
+                    <button type="button" class="btn btn-outline-primary" id="debug-reset" disabled>Reset</button>
+                  </div>
+                  <p>
+                    Status: <span id="debug-status">N/A</span><br />
+                    Last command: <span id="debug-cmd">N/A</span><br />
+                    DP: <span id="debug-dp">N/A</span><br />
+                    CC: <span id="debug-cc">N/A</span>
+                  </p>
+                </div>
+                <div class="col-6">
+                  <label for="debug-input" class="form-label">Input</label>
+                  <textarea class="form-control" id="debug-input" rows="3"></textarea>
+                </div>
+                <div class="col-6">
+                  <label for="debug-output" class="form-label">Output</label>
+                  <textarea class="form-control" id="debug-output" rows="3" readonly></textarea>
+                </div>
+                <div class="col-12 mt-2">
+                  <label for="debug-stack" class="form-label">Stack</label>
+                  <textarea class="form-control" id="debug-stack" rows="1" readonly></textarea>
+                </div>
+              </div>
+            </div>
             <div class="tab-pane fade" id="nav-test" role="tabpanel" aria-labelledby="nav-test-tab">Test content</div>
             <div class="tab-pane fade" id="nav-share" role="tabpanel" aria-labelledby="nav-share-tab">
               <div class="row">

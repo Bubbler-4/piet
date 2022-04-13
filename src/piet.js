@@ -5,7 +5,7 @@ export default class Piet {
     ['pop', '*', '!', 'CC+', 'inN', 'outC'],
   ];
 
-  static initialize() {
+  static {
     this.char2color = {};
     this.colors = [];
     const hueMask = [4, 6, 2, 3, 1, 5];

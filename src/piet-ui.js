@@ -1,10 +1,10 @@
 import Snap from 'snapsvg';
 import $ from 'jquery';
 import Piet from './piet.js';
+import PietRun from './piet-run.js';
 
 export default class PietUI {
   constructor(code) {
-    Piet.initialize();
     this.paletteSvg = Snap('#svg-palette');
     this.paletteRects = [];
     this.paletteOverlays = [];
@@ -263,6 +263,92 @@ export default class PietUI {
     };
     $('#nav-share-tab').on('click', () => {
       this.export.updateExportLink();
+    });
+
+    $('#nav-debug-tab').on('click', () => {
+      const codeGrid = this.code.code;
+      const startEl = $('#debug-start');
+      const stepEl = $('#debug-step');
+      const resetEl = $('#debug-reset');
+      const inputEl = $('#debug-input');
+      const outputEl = $('#debug-output');
+      const stackEl = $('#debug-stack');
+      const statusEl = $('#debug-status');
+      const dpEl = $('#debug-dp');
+      const ccEl = $('#debug-cc');
+      const cmdEl = $('#debug-cmd');
+      startEl.off('click');
+      stepEl.off('click');
+      resetEl.off('click');
+      let origInput;
+      let arrowEl;
+      const updateUi = () => {
+        const { dp, cc, input, output, stack, lastCmd } = this.runner;
+        const dpDesc = PietRun.dpText[dp];
+        const ccDesc = PietRun.ccText[dp * 2 + cc];
+        dpEl.text(`${dp} (${dpDesc})`);
+        ccEl.text(`${cc} (${ccDesc})`);
+        inputEl.val(input);
+        outputEl.val(output);
+        const stackStr = stack.map(n => n.toString()).join(' ');
+        stackEl.val(stackStr);
+        cmdEl.text(lastCmd);
+      };
+      startEl.on('click', () => {
+        outputEl.val('');
+        if (codeGrid[0][0] === 19) {
+          statusEl.text('Error: Starting black cell detected');
+          dpEl.text('N/A');
+          ccEl.text('N/A');
+        } else {
+          origInput = inputEl.val();
+          this.runner = new PietRun(codeGrid, origInput);
+          console.log(this.runner);
+          startEl.prop('disabled', true);
+          stepEl.prop('disabled', false);
+          resetEl.prop('disabled', false);
+          inputEl.prop('readonly', true);
+          statusEl.text('Running');
+          updateUi();
+          arrowEl = this.codeSvg.polygon(20, 5, 20, 25, 30, 15);
+          arrowEl.attr({ fill: 'gray' });
+          const mat = Snap.matrix().translate(
+            this.runner.curC * 30,
+            this.runner.curR * 30,
+          );
+          arrowEl.transform(mat);
+        }
+      });
+      stepEl.on('click', () => {
+        console.log('step');
+        this.runner.step();
+        updateUi();
+        const mat = Snap.matrix()
+          .translate(this.runner.curC * 30, this.runner.curR * 30)
+          .rotate(this.runner.dp * 90, 15, 15);
+        arrowEl.transform(mat);
+        if (this.runner.finished) {
+          stepEl.prop('disabled', true);
+          statusEl.text('Finished');
+          arrowEl.remove();
+        }
+      });
+      resetEl.on('click', () => {
+        console.log('reset');
+        startEl.prop('disabled', false);
+        stepEl.prop('disabled', true);
+        resetEl.prop('disabled', true);
+        inputEl.prop('readonly', false);
+        inputEl.val(origInput);
+        statusEl.text('N/A');
+        dpEl.text('N/A');
+        ccEl.text('N/A');
+        cmdEl.text('N/A');
+        if (arrowEl !== undefined) arrowEl.remove();
+      });
+    });
+    $('#nav-edit-tab, #nav-test-tab, #nav-share-tab').on('click', () => {
+      $('#debug-reset').trigger('click');
     });
   }
 }
