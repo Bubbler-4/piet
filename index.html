@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Piet</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-  <script defer src="/piet/runtime.23ad34f105dd4e4a8c45.bundle.js"></script><script defer src="/piet/vendors.4416ec0cfe23c113e2c1.bundle.js"></script><script defer src="/piet/index.af359a3d8f8bd107f799.bundle.js"></script></head>
+  <script defer src="/piet/runtime.23ad34f105dd4e4a8c45.bundle.js"></script><script defer src="/piet/vendors.4416ec0cfe23c113e2c1.bundle.js"></script><script defer src="/piet/index.249e6f88f36d563d3be1.bundle.js"></script></head>
   <body>
     <div class="container">
       <div class="row">
@@ -60,11 +60,16 @@
             </div>
             <div class="tab-pane fade" id="nav-debug" role="tabpanel" aria-labelledby="nav-debug-tab">
               <div class="row">
-                <div class="col-12">
-                  <div class="btn-group mb-3" role="group" aria-label="Debug control">
+                <div class="col-xs-12 col-sm-8 col-md-6 col-lg-5">
+                  <div class="input-group mb-3" role="group" aria-label="Debug control">
                     <button type="button" class="btn btn-outline-primary" id="debug-start">Start</button>
                     <button type="button" class="btn btn-outline-primary" id="debug-step" disabled>Step</button>
                     <button type="button" class="btn btn-outline-primary" id="debug-reset" disabled>Reset</button>
+                  </div>
+                  <div class="input-group mb-3" role="group" aria-label="Debug control">
+                    <input type="text" class="form-control" id="debug-speed" placeholder="Run speed (steps/sec)">
+                    <button type="button" class="btn btn-outline-primary" id="debug-run" disabled>Run</button>
+                    <button type="button" class="btn btn-outline-primary" id="debug-pause" disabled>Pause</button>
                   </div>
                   <p>
                     Status: <span id="debug-status">N/A</span><br />
@@ -73,6 +78,7 @@
                     CC: <span id="debug-cc">N/A</span>
                   </p>
                 </div>
+                <div class="col-12"></div>
                 <div class="col-6">
                   <label for="debug-input" class="form-label">Input</label>
                   <textarea class="form-control" id="debug-input" rows="3"></textarea>
