@@ -3,8 +3,22 @@ import $ from 'jquery';
 import Piet from './piet.js';
 import PietRun from './piet-run.js';
 
+function adjustHeight() {
+  this.style.height = 'auto';
+  this.style.height = `${this.scrollHeight}px`;
+}
+
 export default class PietUI {
   constructor(code) {
+    $('textarea')
+      .each(function setAttr() {
+        this.setAttribute(
+          'style',
+          `height:${this.scrollHeight}px;overflow-y:hidden;`,
+        );
+      })
+      .on('input', adjustHeight);
+
     this.paletteSvg = Snap('#svg-palette');
     this.paletteRects = [];
     this.paletteOverlays = [];
@@ -278,10 +292,12 @@ export default class PietUI {
     this.export.asciiGrid.on('click', () => {
       const ap = this.code.toAsciiPiet(false);
       this.export.shareContent.val(ap);
+      adjustHeight.call(ap.get(0));
     });
     this.export.asciiMini.on('click', () => {
       const ap = this.code.toAsciiPiet(true);
       this.export.shareContent.val(ap);
+      adjustHeight.call(ap.get(0));
     });
 
     this.import = {
@@ -373,10 +389,14 @@ export default class PietUI {
         outputEl.val(output);
         const stackStr = stack.map(n => n.toString()).join(' ');
         stackEl.val(stackStr);
+        adjustHeight.call(inputEl.get(0));
+        adjustHeight.call(outputEl.get(0));
+        adjustHeight.call(stackEl.get(0));
         cmdEl.text(lastCmd);
       };
       startEl.on('click', () => {
         outputEl.val('');
+        adjustHeight.call(outputEl.get(0));
         if (codeGrid[0][0] === 19) {
           statusEl.text('Error: Starting black cell detected');
           dpEl.text('N/A');
@@ -461,6 +481,7 @@ export default class PietUI {
         resetEl.prop('disabled', true);
         inputEl.prop('readonly', false);
         inputEl.val(origInput);
+        adjustHeight.call(inputEl.get(0));
         statusEl.text('N/A');
         dpEl.text('N/A');
         ccEl.text('N/A');
@@ -487,7 +508,7 @@ export default class PietUI {
         sepEl.val(sep);
         const limitVal = Number(limitEl.val());
         const limit =
-          Number.isSafeInteger(limitVal) && limitVal > 0 ? limitVal : 1000000;
+          Number.isSafeInteger(limitVal) && limitVal > 0 ? limitVal : 10000;
         limitEl.val(limit);
         runEl.prop('disabled', true);
         stopEl.prop('disabled', false);
@@ -564,6 +585,7 @@ export default class PietUI {
             }
           });
           outputEl.val(outputs.join('\n---\n'));
+          adjustHeight.call(outputEl.get(0));
           statusEl.text('Finished');
           stopEl.prop('disabled', true);
           runEl.prop('disabled', false);
