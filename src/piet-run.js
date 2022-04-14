@@ -81,10 +81,10 @@ export default class PietRun {
           self.stack.push(top === 0n ? 1n : 0n);
         }
       },
-      '<': self => {
+      '>': self => {
         if (self.stack.length >= 2) {
           const [top2, top] = self.stack.splice(-2);
-          self.stack.push(top2 < top ? 1n : 0n);
+          self.stack.push(top2 > top ? 1n : 0n);
         }
       },
       'DP+': self => {

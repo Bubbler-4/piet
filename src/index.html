@@ -61,10 +61,21 @@
             <div class="tab-pane fade" id="nav-debug" role="tabpanel" aria-labelledby="nav-debug-tab">
               <div class="row">
                 <div class="col-12">
-                  <div class="btn-group mb-3" role="group" aria-label="Debug control">
-                    <button type="button" class="btn btn-outline-primary" id="debug-start">Start</button>
-                    <button type="button" class="btn btn-outline-primary" id="debug-step" disabled>Step</button>
-                    <button type="button" class="btn btn-outline-primary" id="debug-reset" disabled>Reset</button>
+                  <div class="row">
+                    <div class="col-4">
+                      <div class="input-group mb-3" role="group" aria-label="Debug control">
+                        <button type="button" class="btn btn-outline-primary" id="debug-start">Start</button>
+                        <button type="button" class="btn btn-outline-primary" id="debug-step" disabled>Step</button>
+                        <button type="button" class="btn btn-outline-primary" id="debug-reset" disabled>Reset</button>
+                      </div>
+                    </div>
+                    <div class="col-8">
+                      <div class="input-group mb-3" role="group" aria-label="Debug control">
+                        <input type="text" class="form-control" id="debug-speed" placeholder="Run speed (steps/sec)">
+                        <button type="button" class="btn btn-outline-primary" id="debug-run" disabled>Run</button>
+                        <button type="button" class="btn btn-outline-primary" id="debug-pause" disabled>Pause</button>
+                      </div>
+                    </div>
                   </div>
                   <p>
                     Status: <span id="debug-status">N/A</span><br />

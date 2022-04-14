@@ -1,6 +1,6 @@
 export default class Piet {
   static commandText = [
-    ['', '+', '/', '<', 'dup', 'inC'],
+    ['', '+', '/', '>', 'dup', 'inC'],
     ['push', '-', '%', 'DP+', 'roll', 'outN'],
     ['pop', '*', '!', 'CC+', 'inN', 'outC'],
   ];

@@ -330,9 +330,18 @@ export default class PietUI {
       const dpEl = $('#debug-dp');
       const ccEl = $('#debug-cc');
       const cmdEl = $('#debug-cmd');
+      const speedEl = $('#debug-speed');
+      const runEl = $('#debug-run');
+      const pauseEl = $('#debug-pause');
       startEl.off('click');
       stepEl.off('click');
       resetEl.off('click');
+      runEl.off('click');
+      pauseEl.off('click');
+      let animationId;
+      let animationStartTime;
+      let animationSpeed;
+      let animationSteps;
       let origInput;
       let arrowEl;
       const updateUi = () => {
@@ -360,6 +369,7 @@ export default class PietUI {
           startEl.prop('disabled', true);
           stepEl.prop('disabled', false);
           resetEl.prop('disabled', false);
+          runEl.prop('disabled', false);
           inputEl.prop('readonly', true);
           statusEl.text('Running');
           updateUi();
@@ -374,6 +384,7 @@ export default class PietUI {
       });
       stepEl.on('click', () => {
         console.log('step');
+        statusEl.text('Running');
         this.runner.step();
         updateUi();
         const mat = Snap.matrix()
@@ -385,6 +396,44 @@ export default class PietUI {
           statusEl.text('Finished');
           arrowEl.remove();
         }
+      });
+      runEl.on('click', () => {
+        animationSpeed = Number(speedEl.val());
+        if (
+          Number.isSafeInteger(animationSpeed) &&
+          animationSpeed > 0 &&
+          animationSpeed < 1000
+        ) {
+          runEl.prop('disabled', true);
+          pauseEl.prop('disabled', false);
+          stepEl.prop('disabled', true);
+          statusEl.text('Running');
+          animationStartTime = performance.now();
+          animationSteps = 0;
+          const updateFrame = time => {
+            animationId = requestAnimationFrame(updateFrame);
+            const timeElapsed = time - animationStartTime;
+            const nextSteps = Math.ceil((animationSpeed * timeElapsed) / 1000);
+            for (; animationSteps < nextSteps; animationSteps += 1) {
+              stepEl.trigger('click');
+              if (this.runner.finished) {
+                pauseEl.prop('disabled', true);
+                cancelAnimationFrame(animationId);
+                return;
+              }
+            }
+          };
+          animationId = requestAnimationFrame(updateFrame);
+        } else {
+          console.log('Invalid speed value');
+          statusEl.text('Invalid speed value. Allowed values: 1 - 999');
+        }
+      });
+      pauseEl.on('click', () => {
+        runEl.prop('disabled', false);
+        pauseEl.prop('disabled', true);
+        stepEl.prop('disabled', false);
+        cancelAnimationFrame(animationId);
       });
       resetEl.on('click', () => {
         console.log('reset');
