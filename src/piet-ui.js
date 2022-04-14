@@ -452,5 +452,106 @@ export default class PietUI {
     $('#nav-edit-tab, #nav-test-tab, #nav-share-tab').on('click', () => {
       $('#debug-reset').trigger('click');
     });
+
+    $('#nav-test-tab').on('click', () => {
+      const sepEl = $('#test-sep');
+      const limitEl = $('#test-limit');
+      const runEl = $('#test-run');
+      const stopEl = $('#test-stop');
+      const escapeEl = $('#test-escape');
+      const statusEl = $('#test-status');
+      const inputEl = $('#test-input');
+      const outputEl = $('#test-output');
+
+      runEl.on('click', () => {
+        const sep = sepEl.val() === '' ? '---' : sepEl.val();
+        sepEl.val(sep);
+        const limitVal = Number(limitEl.val());
+        const limit =
+          Number.isSafeInteger(limitVal) && limitVal > 0 ? limitVal : 1000000;
+        limitEl.val(limit);
+        runEl.prop('disabled', true);
+        stopEl.prop('disabled', false);
+        inputEl.prop('readonly', true);
+        const doEscape = escapeEl.prop('checked');
+        let inputs = inputEl.val().split(`\n${sep}\n`);
+        if (doEscape) {
+          inputs = inputs.map(s =>
+            s.replace(
+              /\\[0'"\\nrvtbf]|\\u[0-9a-fA-F]{4}|\\u\{[0-9a-fA-F]+\}|\\x[0-9a-fA-F]{2}/g,
+              match => {
+                if (match.startsWith('\\u') || match.startsWith('\\x')) {
+                  const hex = match.startsWith('\\u{')
+                    ? match.slice(3, -1)
+                    : match.slice(2);
+                  return String.fromCodePoint(Number.parseInt(hex, 16));
+                }
+                return {
+                  '\\0': '\0',
+                  "\\'": "'",
+                  '\\"': '"',
+                  '\\\\': '\\',
+                  '\\n': '\n',
+                  '\\r': '\r',
+                  '\\v': '\v',
+                  '\\t': '\t',
+                  '\\b': '\b',
+                  '\\f': '\f',
+                }[match];
+              },
+            ),
+          );
+        }
+        const runners = inputs.map(input => new PietRun(this.code.code, input));
+        const stepsPerRunner = runners.map(() => 0);
+        let alive = runners.length;
+        const steps = 10; // steps per ms
+        const startTime = performance.now();
+        let stepsRun = 0;
+        let runId;
+        statusEl.text('Running');
+        const update = time => {
+          runId = requestAnimationFrame(update);
+          const totalSteps = Math.ceil(steps * (time - startTime));
+          const singleSteps = Math.round((totalSteps - stepsRun) / alive);
+          runners.forEach((runner, i) => {
+            if (runner.finished) return;
+            for (let s = 0; s < singleSteps; s += 1) {
+              runner.step();
+              stepsRun += 1;
+              stepsPerRunner[i] += 1;
+              if (stepsPerRunner[i] >= limit) {
+                runner.finished = true;
+              }
+              if (runner.finished) {
+                alive -= 1;
+                break;
+              }
+            }
+          });
+          if (alive === 0) {
+            stopEl.trigger('click');
+          }
+          console.log(limit, totalSteps, singleSteps, stepsPerRunner);
+        };
+        stopEl.on('click', () => {
+          cancelAnimationFrame(runId);
+          const outputs = runners.map(runner => runner.output);
+          runners.forEach((runner, i) => {
+            if (!runner.finished) {
+              outputs[i] += '\n** Aborted';
+            } else if (stepsPerRunner[i] >= limit) {
+              outputs[i] += '\n** Exceeded Step Limit';
+            }
+          });
+          outputEl.val(outputs.join('\n---\n'));
+          statusEl.text('Finished');
+          stopEl.prop('disabled', true);
+          runEl.prop('disabled', false);
+          inputEl.prop('readonly', false);
+        });
+        runId = requestAnimationFrame(update);
+      });
+    });
   }
 }

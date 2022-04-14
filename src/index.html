@@ -98,7 +98,36 @@
                 </div>
               </div>
             </div>
-            <div class="tab-pane fade" id="nav-test" role="tabpanel" aria-labelledby="nav-test-tab">Test content</div>
+            <div class="tab-pane fade" id="nav-test" role="tabpanel" aria-labelledby="nav-test-tab">
+              <div class="row">
+                <div class="col-12">
+                  <div class="input-group mb-3">
+                    <span class="input-group-text">Input separator</span>
+                    <input type="text" class="form-control" placeholder="Insert this string between test cases (default: ---)" id="test-sep">
+                  </div>
+                  <div class="input-group mb-3">
+                    <span class="input-group-text">Step limit</span>
+                    <input type="text" class="form-control" placeholder="Positive integer (default: 1000000)" id="test-limit">
+                    <button type="button" class="btn btn-outline-primary" id="test-run">Run</button>
+                    <button type="button" class="btn btn-outline-primary" id="test-stop" disabled>Stop</button>
+                    <span class="input-group-text">Escaped input (JS)</span>
+                    <div class="input-group-text">
+                      <input class="form-check-input mt-0" type="checkbox" value="" id="test-escape">
+                    </div>
+                  </div>
+                  <p>
+                    Status: <span id="test-status">N/A</span>
+                </div>
+                <div class="col-6">
+                  <label for="test-input" class="form-label">Input</label>
+                  <textarea class="form-control" id="test-input" rows="3"></textarea>
+                </div>
+                <div class="col-6">
+                  <label for="test-output" class="form-label">Output</label>
+                  <textarea class="form-control" id="test-output" rows="3" readonly></textarea>
+                </div>
+              </div>
+            </div>
             <div class="tab-pane fade" id="nav-share" role="tabpanel" aria-labelledby="nav-share-tab">
               <div class="row">
                 <div class="col-12">

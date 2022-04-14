@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import Piet from './piet.js';
 
 function divmod(x, y) {
@@ -282,7 +281,7 @@ export default class PietRun {
       }
       [this.curR, this.curC] = curArea.frontier[this.dp * 2 + this.cc];
       this.lastCmd = 'blocked';
-      console.log('blocked');
+      // console.log('blocked');
     } else {
       this.lastChange = 'none';
       if (color === 18) {
@@ -290,7 +289,7 @@ export default class PietRun {
         const nextArea = this.areas[nextR][nextC];
         [this.curR, this.curC] = nextArea.frontier[this.dp * 2 + this.cc];
         this.lastCmd = 'noop';
-        console.log('noop');
+        // console.log('noop');
       } else {
         this.tryHistory.length = 0;
         const nextArea = this.areas[nextR][nextC];
@@ -298,12 +297,12 @@ export default class PietRun {
         const nextColor = nextArea.color;
         if (nextColor === 18) {
           this.lastCmd = 'noop';
-          console.log('noop');
+          // console.log('noop');
         } else {
           const lightDiff = (((nextColor / 6 + 3) | 0) - ((color / 6) | 0)) % 3;
           const hueDiff = ((nextColor % 6) + 6 - (color % 6)) % 6;
           this.lastCmd = Piet.commandText[lightDiff][hueDiff];
-          console.log('cmd:', lightDiff, hueDiff, this.lastCmd);
+          // console.log('cmd:', lightDiff, hueDiff, this.lastCmd);
           PietRun.cmds[this.lastCmd](this, curArea.cells.length);
         }
       }

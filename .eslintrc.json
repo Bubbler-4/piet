@@ -18,6 +18,7 @@
     "no-console": "off",
     "no-empty": "off",
     "spaced-comment": "warn",
-    "prettier/prettier": "warn"
+    "prettier/prettier": "warn",
+    "no-param-reassign": "off"
   }
 }
