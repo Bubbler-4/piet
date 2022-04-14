@@ -91,6 +91,55 @@ export default class Piet {
     return codeGrid;
   }
 
+  static fromAsciiPiet(apcode) {
+    const apgrid = apcode.replace(/[@A-Z_]/g, s => {
+      if (s === '@') {
+        return ' \n';
+      }
+      if (s === '_') {
+        return '?\n';
+      }
+      return `${s.toLowerCase()}\n`;
+    });
+    const ap = 'tvrsqulnjkimdfbcae? ';
+    const codeGrid = apgrid
+      .split('\n')
+      .map(s => [...s].map(c => (ap.indexOf(c) + 20) % 20));
+    const cols = Math.max(1, ...codeGrid.map(row => row.length));
+    codeGrid.forEach(row => {
+      while (row.length < cols) {
+        row.push(19);
+      }
+    });
+    return codeGrid;
+  }
+
+  toAsciiPiet(compact) {
+    const ap = 'tvrsqulnjkimdfbcae? ';
+    const codeStr = this.code.map(row => {
+      const rowStr = row
+        .map(cell => ap[cell])
+        .join('')
+        .trimEnd();
+      return rowStr;
+    });
+    if (!compact) {
+      return codeStr.join('\n');
+    }
+    return codeStr
+      .map((row, i) => {
+        if (i === codeStr.length - 1) {
+          return row;
+        }
+        const [front, back] = [row.slice(0, -1), row.slice(-1)];
+        if (back === '?') {
+          return `${front}_`;
+        }
+        return front + back.toUpperCase();
+      })
+      .join('');
+  }
+
   constructor(code) {
     const codeStr = code || '0';
     this.code = codeStr

@@ -237,6 +237,9 @@ export default class PietUI {
     this.export = {
       pngButton: $('#export-png'),
       svgButton: $('#export-svg'),
+      asciiGrid: $('#export-ascii-grid'),
+      asciiMini: $('#export-ascii-mini'),
+      shareContent: $('#share-content'),
       updateExportLink: () => {
         const { rows, cols } = this.code;
         const matrix = this.code.code;
@@ -272,12 +275,28 @@ export default class PietUI {
     $('#nav-share-tab').on('click', () => {
       this.export.updateExportLink();
     });
+    this.export.asciiGrid.on('click', () => {
+      const ap = this.code.toAsciiPiet(false);
+      this.export.shareContent.val(ap);
+    });
+    this.export.asciiMini.on('click', () => {
+      const ap = this.code.toAsciiPiet(true);
+      this.export.shareContent.val(ap);
+    });
 
     this.import = {
       fileButton: $('#import-file'),
       fileInputButton: $('#import-file-input'),
       asciiButton: $('#import-ascii'),
+      asciiText: $('#share-content'),
     };
+    this.import.asciiButton.on('click', () => {
+      const ascii = this.import.asciiText.val();
+      const codeGrid = Piet.fromAsciiPiet(ascii);
+      console.log(codeGrid);
+      this.code.replaceCode(codeGrid);
+      this.codeRects.update();
+    });
     this.import.fileButton.on('click', () =>
       this.import.fileInputButton.trigger('click'),
     );
