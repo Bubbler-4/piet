@@ -681,6 +681,7 @@ export default class PietUI {
         $('#test-escape').val(exportObj.esc);
         $('#test-input').val(exportObj.input);
         $('#nav-test-tab').trigger('click');
+        setTimeout(() => adjustHeight.call($('#test-input').get(0)), 1000);
       } catch (err) {
         console.log(err);
       }
