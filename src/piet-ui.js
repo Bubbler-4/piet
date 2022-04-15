@@ -371,6 +371,7 @@ export default class PietUI {
       console.log(codeGrid);
       this.code.replaceCode(codeGrid);
       this.codeRects.update();
+      this.export.updateExportLink();
     });
     this.import.fileButton.on('click', () =>
       this.import.fileInputButton.trigger('click'),
@@ -408,8 +409,10 @@ export default class PietUI {
         const codeGrid2 = Piet.compress(codeGrid, width, height);
         this.code.replaceCode(codeGrid2);
         this.codeRects.update();
+        this.export.updateExportLink();
       };
       img.src = url;
+      e.target.value = '';
     });
 
     $('#nav-debug-tab').on('click', () => {
