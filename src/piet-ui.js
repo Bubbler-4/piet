@@ -292,12 +292,12 @@ export default class PietUI {
     this.export.asciiGrid.on('click', () => {
       const ap = this.code.toAsciiPiet(false);
       this.export.shareContent.val(ap);
-      adjustHeight.call(ap.get(0));
+      adjustHeight.call(this.export.shareContent.get(0));
     });
     this.export.asciiMini.on('click', () => {
       const ap = this.code.toAsciiPiet(true);
       this.export.shareContent.val(ap);
-      adjustHeight.call(ap.get(0));
+      adjustHeight.call(this.export.shareContent.get(0));
     });
 
     this.import = {
@@ -441,7 +441,7 @@ export default class PietUI {
         if (
           Number.isSafeInteger(animationSpeed) &&
           animationSpeed > 0 &&
-          animationSpeed < 1000
+          animationSpeed <= 100
         ) {
           runEl.prop('disabled', true);
           pauseEl.prop('disabled', false);
@@ -465,7 +465,7 @@ export default class PietUI {
           animationId = requestAnimationFrame(updateFrame);
         } else {
           console.log('Invalid speed value');
-          statusEl.text('Invalid speed value. Allowed values: 1 - 999');
+          statusEl.text('Invalid speed value. Allowed values: 1 - 100');
         }
       });
       pauseEl.on('click', () => {
@@ -551,6 +551,10 @@ export default class PietUI {
         let runId;
         statusEl.text('Running');
         const update = time => {
+          if (alive === 0) {
+            stopEl.trigger('click');
+            return;
+          }
           runId = requestAnimationFrame(update);
           const totalSteps = Math.ceil(steps * (time - startTime));
           const singleSteps = Math.round((totalSteps - stepsRun) / alive);
@@ -569,12 +573,8 @@ export default class PietUI {
               }
             }
           });
-          if (alive === 0) {
-            stopEl.trigger('click');
-          }
-          console.log(limit, totalSteps, singleSteps, stepsPerRunner);
         };
-        stopEl.on('click', () => {
+        stopEl.one('click', () => {
           cancelAnimationFrame(runId);
           const outputs = runners.map(runner => runner.output);
           runners.forEach((runner, i) => {

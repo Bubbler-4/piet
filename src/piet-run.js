@@ -304,6 +304,7 @@ export default class PietRun {
           this.lastCmd = Piet.commandText[lightDiff][hueDiff];
           // console.log('cmd:', lightDiff, hueDiff, this.lastCmd);
           PietRun.cmds[this.lastCmd](this, curArea.cells.length);
+          [this.curR, this.curC] = nextArea.frontier[this.dp * 2 + this.cc];
         }
       }
     }
