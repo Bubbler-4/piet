@@ -1,11 +1,31 @@
 import Snap from 'snapsvg';
 import $ from 'jquery';
+import pako from 'pako';
+import { Base64 } from 'js-base64';
 import Piet from './piet.js';
 import PietRun from './piet-run.js';
 
 function adjustHeight() {
   this.style.height = 'auto';
   this.style.height = `${this.scrollHeight}px`;
+}
+
+// cyrb53 from https://stackoverflow.com/a/52171480/4595904
+function cyrb53(str, seed = 0) {
+  let h1 = 0xdeadbeef ^ seed;
+  let h2 = 0x41c6ce57 ^ seed;
+  [...str].forEach(c => {
+    const ch = c.charCodeAt();
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  });
+  h1 =
+    Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^
+    Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 =
+    Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^
+    Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return `${h1}${h2}`;
 }
 
 export default class PietUI {
@@ -254,6 +274,8 @@ export default class PietUI {
       asciiGrid: $('#export-ascii-grid'),
       asciiMini: $('#export-ascii-mini'),
       shareContent: $('#share-content'),
+      permButton: $('#export-perm'),
+      golfButton: $('#export-golf'),
       updateExportLink: () => {
         const { rows, cols } = this.code;
         const matrix = this.code.code;
@@ -297,6 +319,43 @@ export default class PietUI {
     this.export.asciiMini.on('click', () => {
       const ap = this.code.toAsciiPiet(true);
       this.export.shareContent.val(ap);
+      adjustHeight.call(this.export.shareContent.get(0));
+    });
+    const getPermalink = () => {
+      // code, sep, lim, input, esc
+      const exportObj = {
+        code: this.code.code,
+        sep: $('#test-sep').val(),
+        lim: $('#test-limit').val(),
+        esc: $('#test-escape').prop('checked'),
+        input: $('#test-input').val(),
+      };
+      this.export.shareContent.val(JSON.stringify(exportObj));
+      const compressed = pako.deflate(JSON.stringify(exportObj));
+      const b64 = Base64.fromUint8Array(compressed, true);
+      return `${document.URL.split('#')[0]}#${b64}`;
+    };
+    this.export.permButton.on('click', () => {
+      const permalink = getPermalink();
+      this.export.shareContent.val(permalink);
+      adjustHeight.call(this.export.shareContent.get(0));
+    });
+    this.export.golfButton.on('click', () => {
+      const asciiPiet = this.code.toAsciiPiet(true);
+      const bytes = asciiPiet.length;
+      const codels = this.code.rows * this.code.cols;
+      const permalink = getPermalink();
+      const hash = cyrb53(permalink);
+      const postHeader = `# [Piet] + [ascii-piet], ${bytes} bytes (${this.code.rows}\xd7${this.code.cols}=${codels} codels)`;
+      const postMain = ['```none', asciiPiet, '```'].join('\n');
+      const postFooter = `[Try Piet online!][piet-${hash}]`;
+      const links = [
+        '[Piet]: https://www.dangermouse.net/esoteric/piet.html',
+        '[ascii-piet]: https://github.com/dloscutoff/ascii-piet',
+        `[piet-${hash}]: ${permalink}`,
+      ].join('\n');
+      const post = [postHeader, postMain, postFooter, links].join('\n\n');
+      this.export.shareContent.val(post);
       adjustHeight.call(this.export.shareContent.get(0));
     });
 
@@ -594,5 +653,37 @@ export default class PietUI {
         runId = requestAnimationFrame(update);
       });
     });
+
+    const loadFromPermalink = () => {
+      const hash = document.location.hash.slice(1);
+      const compressed = Base64.toUint8Array(hash);
+      try {
+        const exportJSON = pako.inflate(compressed, { to: 'string' });
+        const exportObj = JSON.parse(exportJSON);
+        // ensure that the obj has all five fields
+        if (
+          exportObj.code === undefined ||
+          exportObj.sep === undefined ||
+          exportObj.lim === undefined ||
+          exportObj.esc === undefined ||
+          exportObj.input === undefined
+        ) {
+          console.log(exportObj);
+          throw new TypeError('Decoded object does not have necessary fields');
+        }
+        this.code.replaceCode(exportObj.code);
+        this.codeRects.update();
+        $('#test-sep').val(exportObj.sep);
+        $('#test-limit').val(exportObj.lim);
+        $('#test-escape').val(exportObj.esc);
+        $('#test-input').val(exportObj.input);
+        $('#nav-test-tab').trigger('click');
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    if (document.location.hash !== '') {
+      loadFromPermalink();
+    }
   }
 }
