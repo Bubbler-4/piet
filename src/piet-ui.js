@@ -267,6 +267,9 @@ export default class PietUI {
       });
     });
     writeButton.trigger('click');
+    $('#nav-edit').on('click', () => {
+      writeButton.trigger('click');
+    });
 
     this.export = {
       pngButton: $('#export-png'),
@@ -551,9 +554,12 @@ export default class PietUI {
         if (arrowEl !== undefined) arrowEl.remove();
       });
     });
-    $('#nav-edit-tab, #nav-test-tab, #nav-share-tab').on('click', () => {
-      $('#debug-reset').trigger('click');
-    });
+    $('#nav-edit-tab, #nav-test-tab, #nav-explain-tab, #nav-share-tab').on(
+      'click',
+      () => {
+        $('#debug-reset').trigger('click');
+      },
+    );
 
     $('#nav-test-tab').on('click', () => {
       const sepEl = $('#test-sep');
@@ -655,6 +661,174 @@ export default class PietUI {
         });
         runId = requestAnimationFrame(update);
       });
+    });
+
+    // explained: push[num] pop[x] [+] [-] [*] [/] [%] [!] [>] [D]P+ [C]C+
+    // [d]up [r]oll [I]nN [i]nC [O]utN [o]utC
+    this.codeSvg
+      .circle(0, 0, 5)
+      .attr({ fill: 'gray', stroke: 'none' })
+      .marker(-5, -5, 10, 10, 0, 0)
+      .attr({ id: 'mark2' });
+    this.codeSvg
+      .polygon([0, -10, 0, 10, 10, 0])
+      .attr({ fill: 'black', stroke: 'none' })
+      .marker(0, -10, 10, 20, 10, 0)
+      .attr({ id: 'mark1' });
+    // path[r][c] = [...[fromr, fromc, tor, toc, cmd]]
+    // pathG[r][c] = svg group that contains all line segments
+    this.explain = {
+      path: [[]],
+      pathG: [[]],
+      initPath: () => {
+        this.explain.path = this.code.code.map(row => row.map(() => []));
+        this.explain.pathG = this.code.code.map(row =>
+          row.map(() => this.codeSvg.g()),
+        );
+        this.explain.runner = new PietRun(this.code.code, '');
+      },
+      destroyPath: () => {
+        this.explain.pathG.forEach(row => row.forEach(g => g.remove()));
+      },
+      drawCmd: (groupEl, prevRow, prevCol, nextRow, nextCol, cmd, isFirst) => {
+        const x1 = prevCol * 30 + 15;
+        const y1 = prevRow * 30 + 15;
+        const x2 = nextCol * 30 + 15;
+        const y2 = nextRow * 30 + 15;
+        const line = groupEl.line(x1, y1, x2, y2);
+        // line.attr({ stroke: 'black', 'marker-end': 'url(#mark2)' });
+        line.attr({ stroke: 'black' });
+        line.node.style['marker-end'] = Snap.url('mark2');
+        if (isFirst) {
+          line.node.style['marker-start'] = Snap.url('mark1');
+          // line.attr({ 'marker-start': 'url(#mark1)' });
+        } else {
+          line.node.style['marker-start'] = Snap.url('mark2');
+          // line.attr({ 'marker-start': 'url(#mark2)' });
+        }
+        if (cmd !== '') {
+          let [xt, yt] = [0, 0];
+          if (nextCol === prevCol + 1) {
+            [xt, yt] = [prevCol * 30 + 22, prevRow * 30 + 8];
+          } else if (nextRow === prevRow + 1) {
+            [xt, yt] = [prevCol * 30 + 22, prevRow * 30 + 22];
+          } else if (nextCol === prevCol - 1) {
+            [xt, yt] = [prevCol * 30 + 8, prevRow * 30 + 22];
+          } else if (nextRow === prevRow - 1) {
+            [xt, yt] = [prevCol * 30 + 8, prevRow * 30 + 8];
+          }
+          const cmdText = groupEl.text(xt, yt, cmd);
+          const prevCode = this.code.code[prevRow][prevCol];
+          cmdText.attr({
+            'text-anchor': 'middle',
+            'dominant-baseline': 'middle',
+            'pointer-events': 'none',
+            'font-size': '10px',
+            fill: prevCode === 10 || prevCode === 16 ? 'white' : 'black',
+          });
+        }
+      },
+      drawDash: (groupEl, prevRow, prevCol, nextRow, nextCol) => {
+        const x1 = prevCol * 30 + 15;
+        const y1 = prevRow * 30 + 15;
+        const x2 = nextCol * 30 + 15;
+        const y2 = nextRow * 30 + 15;
+        const line = groupEl.line(x1, y1, x2, y2);
+        line.attr({ stroke: 'black', 'stroke-dasharray': '4' });
+      },
+      addPath: (row, col, dp, cc) => {
+        const path = this.explain.runner.dryRun(row, col, dp, cc);
+        this.explain.path[row][col] = path;
+        let [curRow, curCol] = [row, col];
+        const g = this.explain.pathG[row][col];
+        path.forEach(([prevRow, prevCol, nextRow, nextCol, cmd], i) => {
+          // draw commands, and dashed lines on big area jumps
+          if (curRow !== prevRow || curCol !== prevCol) {
+            this.explain.drawDash(g, curRow, curCol, prevRow, prevCol);
+          }
+          this.explain.drawCmd(
+            g,
+            prevRow,
+            prevCol,
+            nextRow,
+            nextCol,
+            cmd,
+            i === 0,
+          );
+          [curRow, curCol] = [nextRow, nextCol];
+        });
+      },
+      removePath: (row, col) => {
+        this.explain.path[row][col].length = 0;
+        this.explain.pathG[row][col]
+          .children()
+          .forEach(child => child.remove());
+      },
+      togglePath: (row, col, dp, cc) => {
+        if (this.explain.path[row][col].length === 0) {
+          this.explain.addPath(row, col, dp, cc);
+        } else {
+          this.explain.removePath(row, col);
+        }
+      },
+      exportButton: $('#export-explained'),
+      exportUrl: undefined,
+      updateExportLink: () => {
+        if (this.explain.exportUrl !== undefined) {
+          URL.revokeObjectURL(this.explain.exportUrl);
+        }
+        const svgStr = this.codeSvg
+          .outerSVG()
+          .replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+        const svgBlob = new Blob([svgStr]);
+        const svgUrl = URL.createObjectURL(svgBlob);
+        this.explain.exportButton.prop({ href: svgUrl });
+        this.explain.exportUrl = svgUrl;
+      },
+    };
+
+    $('#nav-explain-tab').on('click', () => {
+      // on svg click: if there's already a path, remove it;
+      // otherwise add a new path starting there
+      this.codeSvg.undrag();
+      this.codeSvg.unclick();
+      this.explain.initPath();
+      this.codeSvg.click(e => {
+        const curR = ((e.offsetY - 3) / 30) | 0;
+        const curC = ((e.offsetX - 3) / 30) | 0;
+        if (
+          curR >= 0 &&
+          curR < this.code.rows &&
+          curC >= 0 &&
+          curC < this.code.cols &&
+          this.code.code[curR][curC] !== 19
+        ) {
+          let dp = 0;
+          if ($('#explain-dp-0').prop('checked')) {
+            dp = 0;
+          } else if ($('#explain-dp-1').prop('checked')) {
+            dp = 1;
+          } else if ($('#explain-dp-2').prop('checked')) {
+            dp = 2;
+          } else if ($('#explain-dp-3').prop('checked')) {
+            dp = 3;
+          }
+          let cc = 0;
+          if ($('#explain-cc-0').prop('checked')) {
+            cc = 0;
+          } else if ($('#explain-cc-1').prop('checked')) {
+            cc = 1;
+          }
+          this.explain.togglePath(curR, curC, dp, cc);
+          // console.log(this.explain);
+          this.explain.updateExportLink();
+        }
+      });
+    });
+    $('#nav-debug, #nav-test, #nav-share').on('click', () => {
+      this.codeSvg.undrag();
+      this.codeSvg.unclick();
+      this.explain.destroyPath();
     });
 
     const loadFromPermalink = () => {

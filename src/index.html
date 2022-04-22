@@ -25,6 +25,7 @@
               <button class="nav-link active" id="nav-edit-tab" data-bs-toggle="tab" data-bs-target="#nav-edit" type="button" role="tab" aria-controls="nav-edit" aria-selected="true">Edit</button>
               <button class="nav-link" id="nav-debug-tab" data-bs-toggle="tab" data-bs-target="#nav-debug" type="button" role="tab" aria-controls="nav-debug" aria-selected="false">Debug</button>
               <button class="nav-link" id="nav-test-tab" data-bs-toggle="tab" data-bs-target="#nav-test" type="button" role="tab" aria-controls="nav-test" aria-selected="false">Test</button>
+              <button class="nav-link" id="nav-explain-tab" data-bs-toggle="tab" data-bs-target="#nav-explain" type="button" role="tab" aria-controls="nav-explain" aria-selected="false">Explain</button>
               <button class="nav-link" id="nav-share-tab" data-bs-toggle="tab" data-bs-target="#nav-share" type="button" role="tab" aria-controls="nav-share" aria-selected="false">Import/Export/Share</button>
             </div>
           </nav>
@@ -125,6 +126,36 @@
                 <div class="col-6">
                   <label for="test-output" class="form-label">Output</label>
                   <textarea class="form-control" id="test-output" readonly></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="nav-explain" role="tabpanel" aria-labelledby="nav-explain-tab">
+              <div class="row">
+                <div class="col-12">
+                  <h5>Explain</h5>
+                  <p>Select DP and CC, and then click the starting point to add an execution path.<br />
+                  Click a starting point again to remove it.</p>
+                  <div class="btn-group" role="group" aria-label="Initial DP">
+                    <div class="input-group-text">DP</div>
+                    <input type="radio" class="btn-check" name="explain-dp" id="explain-dp-0" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="explain-dp-0">Right</label>
+                    <input type="radio" class="btn-check" name="explain-dp" id="explain-dp-1" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="explain-dp-1">Down</label>
+                    <input type="radio" class="btn-check" name="explain-dp" id="explain-dp-2" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="explain-dp-2">Left</label>
+                    <input type="radio" class="btn-check" name="explain-dp" id="explain-dp-3" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="explain-dp-3">Up</label>
+                  </div>
+                  <div class="btn-group" role="group" aria-label="Initial CC">
+                    <div class="input-group-text">CC</div>
+                    <input type="radio" class="btn-check" name="explain-cc" id="explain-cc-0" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="explain-cc-0">Left</label>
+                    <input type="radio" class="btn-check" name="explain-cc" id="explain-cc-1" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="explain-cc-1">Right</label>
+                  </div>
+                  <div class="btn-group" role="group" aria-label="Export explained">
+                    <a href="#" class="btn btn-outline-primary" id="export-explained" download="piet_explained.svg">Export</a>
+                  </div>
                 </div>
               </div>
             </div>

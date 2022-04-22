@@ -30,6 +30,25 @@ export default class PietRun {
       'Left',
       'Right',
     ];
+    this.abbrev = {
+      push: '',
+      pop: 'x',
+      '+': '+',
+      '-': '-',
+      '*': '*',
+      '/': '/',
+      '%': '%',
+      '!': '!',
+      '>': '>',
+      'DP+': 'D',
+      'CC+': 'C',
+      dup: 'd',
+      roll: 'r',
+      inN: 'I',
+      inC: 'i',
+      outN: 'O',
+      outC: 'o',
+    };
     this.cmds = {
       push: (self, size) => {
         self.stack.push(BigInt(size));
@@ -308,5 +327,98 @@ export default class PietRun {
         }
       }
     }
+  }
+
+  dryStep() {
+    const cycleDetected = this.tryHistory.some(
+      ([r, c, dp, cc]) =>
+        this.curR === r && this.curC === c && this.dp === dp && this.cc === cc,
+    );
+    if (cycleDetected) {
+      this.finished = true;
+      return { finished: true };
+    }
+    const [lastR, lastC] = [this.curR, this.curC];
+    const curArea = this.areas[this.curR][this.curC];
+    const { color, frontierOut, frontierBlocked } = curArea;
+    const [nextR, nextC] = frontierOut[this.dp * 2 + this.cc];
+    const blocked = frontierBlocked[this.dp * 2 + this.cc];
+    if (blocked) {
+      this.tryHistory.push([this.curR, this.curC, this.dp, this.cc]);
+      if (this.lastChange === 'cc') {
+        this.dp = (this.dp + 1) & 3;
+        this.lastChange = 'dp';
+      } else {
+        this.cc = 1 - this.cc;
+        this.lastChange = 'cc';
+      }
+      [this.curR, this.curC] = curArea.frontier[this.dp * 2 + this.cc];
+      this.lastCmd = 'blocked';
+      return { finished: false, blocked: true };
+      // console.log('blocked');
+    }
+    this.lastChange = 'none';
+    if (color === 18) {
+      this.tryHistory.push([this.curR, this.curC, this.dp, this.cc]);
+      const nextArea = this.areas[nextR][nextC];
+      [this.curR, this.curC] = nextArea.frontier[this.dp * 2 + this.cc];
+      this.lastCmd = 'noop';
+      // console.log('noop');
+    } else {
+      this.tryHistory.length = 0;
+      const nextArea = this.areas[nextR][nextC];
+      [this.curR, this.curC] = nextArea.frontier[this.dp * 2 + this.cc];
+      const nextColor = nextArea.color;
+      if (nextColor === 18) {
+        this.lastCmd = 'noop';
+        // console.log('noop');
+      } else {
+        const lightDiff = (((nextColor / 6 + 3) | 0) - ((color / 6) | 0)) % 3;
+        const hueDiff = ((nextColor % 6) + 6 - (color % 6)) % 6;
+        this.lastCmd = Piet.commandText[lightDiff][hueDiff];
+        // console.log('cmd:', lightDiff, hueDiff, this.lastCmd);
+        // PietRun.cmds[this.lastCmd](this, curArea.cells.length);
+        [this.curR, this.curC] = nextArea.frontier[this.dp * 2 + this.cc];
+      }
+    }
+    let abb = '';
+    if (this.lastCmd === 'push') {
+      abb = `${curArea.cells.length}`;
+    } else if (this.lastCmd !== 'noop') {
+      abb = PietRun.abbrev[this.lastCmd];
+    }
+    return {
+      finished: false,
+      blocked: false,
+      data: [lastR, lastC, nextR, nextC, abb],
+      stop: abb === 'D' || abb === 'C', // stop tracing at DP+ or CC+
+    };
+  }
+
+  dryRun(row, col, dp, cc) {
+    const startArea = this.areas[row][col];
+    [this.curR, this.curC] = startArea.frontier[dp * 2 + cc];
+    this.dp = dp;
+    this.cc = cc;
+    const history = {};
+    this.finished = false;
+    const path = [];
+    let gFinished = false;
+    let gStop = false;
+    while (
+      !gFinished &&
+      !gStop &&
+      !history[[this.curR, this.curC, this.dp, this.cc]]
+    ) {
+      history[[this.curR, this.curC, this.dp, this.cc]] = true;
+      const { finished, blocked, data, stop } = this.dryStep();
+      if (finished) {
+        gFinished = true;
+      } else if (!blocked) {
+        path.push(data);
+        gStop = stop;
+      }
+    }
+    return path;
   }
 }
