@@ -267,7 +267,7 @@ export default class PietUI {
       });
     });
     writeButton.trigger('click');
-    $('#nav-edit').on('click', () => {
+    $('#nav-edit-tab').on('click', () => {
       writeButton.trigger('click');
     });
 
@@ -825,9 +825,12 @@ export default class PietUI {
         }
       });
     });
-    $('#nav-debug, #nav-test, #nav-share').on('click', () => {
+    $('#nav-debug-tab, #nav-test-tab, #nav-share-tab').on('click', () => {
       this.codeSvg.undrag();
       this.codeSvg.unclick();
+      this.explain.destroyPath();
+    });
+    $('#nav-edit-tab').on('click', () => {
       this.explain.destroyPath();
     });
 
