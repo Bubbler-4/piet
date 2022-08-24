@@ -140,10 +140,10 @@ export default class PietRun {
         // if no digits found, no-op
         const spaces = self.input.match(/^\s*/)[0];
         self.input = self.input.slice(spaces.length);
-        const number = self.input.match(/^[0-9]*/)[0];
-        if (number.length > 0) {
-          self.stack.push(BigInt(number));
-          self.input = self.input.slice(number.length);
+        const number = self.input.match(/^[-+]?[0-9]+/);
+        if (number !== null) {
+          self.stack.push(BigInt(number[0]));
+          self.input = self.input.slice(number[0].length);
         }
       },
       inC: self => {
