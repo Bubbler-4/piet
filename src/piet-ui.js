@@ -352,6 +352,7 @@ export default class PietUI {
       const postHeader = `# [Piet] + [ascii-piet], ${bytes} bytes (${this.code.rows}\xd7${this.code.cols}=${codels} codels)`;
       const postMain = ['```none', asciiPiet, '```'].join('\n');
       const postFooter = `[Try Piet online!][piet-${hash}]`;
+      console.log(this.code.plain());
       const links = [
         '[Piet]: https://www.dangermouse.net/esoteric/piet.html',
         '[ascii-piet]: https://github.com/dloscutoff/ascii-piet',

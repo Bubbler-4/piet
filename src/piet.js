@@ -199,4 +199,9 @@ export default class Piet {
     this.rows = this.code.length;
     this.cols = this.code[0].length;
   }
+
+  plain() {
+    const ret = `${this.rows},${this.cols}`;
+    return `${ret},${this.code.join(',')}`;
+  }
 }
