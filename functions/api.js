@@ -1,3 +1,5 @@
+/* eslint-disable import/prefer-default-export */
 export function onRequest(context) {
-  return new Response("Hello, world!")
+  console.log(context.request);
+  return new Response('Hello, world!');
 }
