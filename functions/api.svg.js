@@ -27,10 +27,10 @@ export function onRequest(context) {
     return String.fromCharCode(((r / 26 / 26) | 0) + 65, ((r / 26) | 0) % 26 + 65, r % 26 + 65);
   };
   for (let r = 0; r < rows; r += 1) {
-    svgBody += `<use href="#t" x="7.5" y="${r * 30 + 10 - 15}">${rowIndex(r)}</use>`;
+    svgBody += `<text fill="#000000" style="text-anchor: middle; dominant-baseline: middle; font-size: 10px;" x="7.5" y="${r * 30 + 10 + 15}">${rowIndex(r)}</text>`;
   }
   for (let c = 0; c < cols; c += 1) {
-    svgBody += `<use href="#t" x="${c * 30 + 15 - 15}" y="5">${c}</use>`;
+    svgBody += `<text fill="#000000" style="text-anchor: middle; dominant-baseline: middle; font-size: 10px;" x="${c * 30 + 15 + 15}" y="5">${c}</text>`;
   }
   const svgFooter = '</svg>';
   const response = new Response(svgHeader + svgDefs + svgBody + svgFooter);
