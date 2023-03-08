@@ -39,14 +39,29 @@
                   <svg id="svg-palette"></svg>
                 </div>
                 <div class="col-12 mt-3 mb-3">
-                  <div class="btn-group" role="group" aria-label="Grid edit mode">
+                  <div class="btn-group mr-3" role="group" aria-label="Grid edit mode">
                     <input type="radio" class="btn-check" name="grid-edit-mode" id="grid-write" autocomplete="off" checked>
                     <label class="btn btn-outline-primary" for="grid-write"><i class="bi bi-pencil"></i></label>
                   
                     <input type="radio" class="btn-check" name="grid-edit-mode" id="grid-pick" autocomplete="off">
                     <label class="btn btn-outline-primary" for="grid-pick"><i class="bi bi-eyedropper"></i></label>
                   </div>
+                  <div class="btn-group mr-3" role="group" aria-label="Palette label mode">
+                    <div class="input-group-text">Label</div>
+                    <input type="radio" class="btn-check" name="grid-label-mode" id="grid-forward" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="grid-forward">FW</label>
+                  
+                    <input type="radio" class="btn-check" name="grid-label-mode" id="grid-backward" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="grid-backward">BW</label>
+                  </div>
+                  <div class="btn-group" role="group" aria-label="Undo and redo">
+                    <button type="button" class="btn btn-outline-primary" id="grid-undo"><i class="bi bi-arrow-counterclockwise"></i></button>
+                    <button type="button" class="btn btn-outline-primary" id="grid-redo"><i class="bi bi-arrow-clockwise"></i></button>
+                  </div>
+                </div>
+                <div class="col-12 mb-3">
                   <div class="btn-group" role="group" aria-label="Grid control">
+                    <div class="input-group-text">Grid</div>
                     <button type="button" class="btn btn-outline-primary" id="grid-lplus">L+</button>
                     <button type="button" class="btn btn-outline-primary" id="grid-lminus">L-</button>
                     <button type="button" class="btn btn-outline-primary" id="grid-rplus">R+</button>

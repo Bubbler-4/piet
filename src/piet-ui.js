@@ -151,6 +151,7 @@ export default class PietUI {
     this.edit = {
       mode: 'write',
       color: 0,
+      forward: true,
       selectColor: clr => {
         this.paletteRects[clr].attr({
           stroke: 'gray',
@@ -165,7 +166,7 @@ export default class PietUI {
           const curLight = (clr / 6) | 0;
           for (let lightOff = 0; lightOff < 3; lightOff += 1) {
             for (let hueOff = 0; hueOff < 6; hueOff += 1) {
-              const s = Piet.commandText[lightOff][hueOff];
+              const s = Piet.commandText(this.edit.forward)[lightOff][hueOff];
               const nextHue = (curHue + hueOff) % 6;
               const nextLight = (curLight + lightOff) % 3;
               this.paletteOverlays[nextLight][nextHue].node.textContent = s;

@@ -1,9 +1,19 @@
 export default class Piet {
-  static commandText = [
+  static commandTextForward = [
     ['', '+', '/', '>', 'dup', 'inC'],
     ['push', '-', '%', 'DP+', 'roll', 'outN'],
     ['pop', '*', '!', 'CC+', 'inN', 'outC'],
   ];
+
+  static commandTextReverse = [
+    ['', 'inC', 'dup', '>', '/', '+'],
+    ['pop', 'outC', 'inN', 'CC+', '!', '*'],
+    ['push', 'outN', 'roll', 'DP+', '%', '-'],
+  ];
+
+  static commandText(forward) {
+    return forward ? this.commandTextForward : this.commandTextReverse;
+  }
 
   static {
     this.char2color = {};
