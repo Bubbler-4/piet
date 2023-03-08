@@ -320,7 +320,7 @@ export default class PietRun {
         } else {
           const lightDiff = (((nextColor / 6 + 3) | 0) - ((color / 6) | 0)) % 3;
           const hueDiff = ((nextColor % 6) + 6 - (color % 6)) % 6;
-          this.lastCmd = Piet.commandText[lightDiff][hueDiff];
+          this.lastCmd = Piet.commandTextForward[lightDiff][hueDiff];
           // console.log('cmd:', lightDiff, hueDiff, this.lastCmd);
           PietRun.cmds[this.lastCmd](this, curArea.cells.length);
           [this.curR, this.curC] = nextArea.frontier[this.dp * 2 + this.cc];
@@ -375,7 +375,7 @@ export default class PietRun {
       } else {
         const lightDiff = (((nextColor / 6 + 3) | 0) - ((color / 6) | 0)) % 3;
         const hueDiff = ((nextColor % 6) + 6 - (color % 6)) % 6;
-        this.lastCmd = Piet.commandText[lightDiff][hueDiff];
+        this.lastCmd = Piet.commandTextForward[lightDiff][hueDiff];
         // console.log('cmd:', lightDiff, hueDiff, this.lastCmd);
         // PietRun.cmds[this.lastCmd](this, curArea.cells.length);
         [this.curR, this.curC] = nextArea.frontier[this.dp * 2 + this.cc];

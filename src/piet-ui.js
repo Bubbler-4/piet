@@ -162,11 +162,12 @@ export default class PietUI {
           height: '-=6',
         });
         if (clr < 18) {
+          const commandText = Piet.commandText(this.edit.forward);
           const curHue = clr % 6;
           const curLight = (clr / 6) | 0;
           for (let lightOff = 0; lightOff < 3; lightOff += 1) {
             for (let hueOff = 0; hueOff < 6; hueOff += 1) {
-              const s = Piet.commandText(this.edit.forward)[lightOff][hueOff];
+              const s = commandText[lightOff][hueOff];
               const nextHue = (curHue + hueOff) % 6;
               const nextLight = (curLight + lightOff) % 3;
               this.paletteOverlays[nextLight][nextHue].node.textContent = s;
