@@ -157,9 +157,49 @@ export default class Piet {
       .map(row => [...row].map(cell => Piet.char2color[cell]));
     this.rows = this.code.length;
     this.cols = this.code[0].length;
+    this.history = [this.code];
+    this.historyIndex = 0;
+    this.canUndo = false;
+    this.canRedo = false;
+  }
+
+  prepareHistoryForAction() {
+    this.history.splice(this.historyIndex + 1, Infinity);
+    const codeCopy = [this.code.map(row => row.map(cell => cell))];
+    this.history.push(codeCopy);
+    this.historyIndex += 1;
+    this.canUndo = true;
+    this.canRedo = false;
+    this.code = this.history[this.historyIndex];
+  }
+
+  undo() {
+    if (!this.canUndo) return;
+    this.historyIndex -= 1;
+    this.canUndo = this.historyIndex > 0;
+    this.canRedo = true;
+    this.code = this.history[this.historyIndex];
+    this.rows = this.code.length;
+    this.cols = this.code[0].length;
+  }
+
+  redo() {
+    if (!this.canRedo) return;
+    this.historyIndex += 1;
+    this.canUndo = true;
+    this.canRedo = this.historyIndex < this.history.length - 1;
+    this.code = this.history[this.historyIndex];
+    this.rows = this.code.length;
+    this.cols = this.code[0].length;
+  }
+
+  updateCell(r, c, clr) {
+    this.prepareHistoryForAction();
+    this.code[r][c] = clr;
   }
 
   extendCode(direction) {
+    this.prepareHistoryForAction();
     if (direction === 'r') {
       this.code.forEach(row => {
         row.push(19);
@@ -180,6 +220,7 @@ export default class Piet {
   }
 
   shrinkCode(direction) {
+    this.prepareHistoryForAction();
     if (
       ((direction === 'r' || direction === 'l') && this.cols === 1) ||
       ((direction === 'u' || direction === 'd') && this.rows === 1)
@@ -205,6 +246,7 @@ export default class Piet {
   }
 
   replaceCode(newCode) {
+    this.prepareHistoryForAction();
     this.code = newCode;
     this.rows = this.code.length;
     this.cols = this.code[0].length;

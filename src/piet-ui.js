@@ -148,6 +148,31 @@ export default class PietUI {
       });
     };
     this.codeRects.update();
+
+    const undoButton = $('#grid-undo');
+    const redoButton = $('#grid-redo');
+    const setUndoRedoButtonState = () => {
+      undoButton.prop('disabled', !this.code.canUndo);
+      redoButton.prop('disabled', !this.code.canRedo);
+    };
+    undoButton.on('click', () => {
+      if (this.code.canUndo) {
+        this.code.undo();
+        this.codeRects.update();
+        setUndoRedoButtonState();
+      }
+    });
+    redoButton.on('click', () => {
+      if (this.code.canRedo) {
+        this.code.redo();
+        this.codeRects.update();
+        setUndoRedoButtonState();
+      }
+    });
+    $('#nav-edit-tab').on('click', () => {
+      setUndoRedoButtonState();
+    });
+
     this.edit = {
       mode: 'write',
       color: 0,
@@ -198,8 +223,9 @@ export default class PietUI {
         this.edit.selectColor(clr);
       },
       updateCodeColor1: (r, c, clr) => {
-        this.code.code[r][c] = clr;
+        this.code.updateCell(r, c, clr);
         this.codeRects[r][c].attr({ fill: Piet.colors[clr].colorcode });
+        setUndoRedoButtonState();
       },
     };
     this.edit.selectColor(0);
@@ -217,6 +243,7 @@ export default class PietUI {
             this.code.shrinkCode(direction);
           }
           this.codeRects.update();
+          setUndoRedoButtonState();
         });
       });
     });
