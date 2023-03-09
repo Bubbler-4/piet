@@ -223,6 +223,7 @@ export default class PietUI {
         this.edit.selectColor(clr);
       },
       updateCodeColor1: (r, c, clr) => {
+        if (this.code.code[r][c] === clr) return;
         this.code.updateCell(r, c, clr);
         this.codeRects[r][c].attr({ fill: Piet.colors[clr].colorcode });
         setUndoRedoButtonState();
