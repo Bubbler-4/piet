@@ -250,6 +250,7 @@ export default class Piet {
     this.code = newCode;
     this.rows = this.code.length;
     this.cols = this.code[0].length;
+    this.history[this.historyIndex] = this.code;
   }
 
   plain() {
