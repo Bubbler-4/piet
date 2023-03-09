@@ -165,13 +165,12 @@ export default class Piet {
 
   prepareHistoryForAction() {
     this.history.splice(this.historyIndex + 1, Infinity);
-    const codeCopy = [this.code.map(row => row.map(cell => cell))];
+    const codeCopy = this.code.map(row => row.map(cell => cell));
     this.history.push(codeCopy);
     this.historyIndex += 1;
     this.canUndo = true;
     this.canRedo = false;
     this.code = this.history[this.historyIndex];
-    console.log(this);
   }
 
   undo() {
@@ -182,7 +181,6 @@ export default class Piet {
     this.code = this.history[this.historyIndex];
     this.rows = this.code.length;
     this.cols = this.code[0].length;
-    console.log(this);
   }
 
   redo() {
@@ -193,7 +191,6 @@ export default class Piet {
     this.code = this.history[this.historyIndex];
     this.rows = this.code.length;
     this.cols = this.code[0].length;
-    console.log(this);
   }
 
   updateCell(r, c, clr) {
