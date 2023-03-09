@@ -171,6 +171,7 @@ export default class Piet {
     this.canUndo = true;
     this.canRedo = false;
     this.code = this.history[this.historyIndex];
+    console.log(this);
   }
 
   undo() {
