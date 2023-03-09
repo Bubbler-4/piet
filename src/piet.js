@@ -182,6 +182,7 @@ export default class Piet {
     this.code = this.history[this.historyIndex];
     this.rows = this.code.length;
     this.cols = this.code[0].length;
+    console.log(this);
   }
 
   redo() {
@@ -192,6 +193,7 @@ export default class Piet {
     this.code = this.history[this.historyIndex];
     this.rows = this.code.length;
     this.cols = this.code[0].length;
+    console.log(this);
   }
 
   updateCell(r, c, clr) {
