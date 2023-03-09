@@ -273,6 +273,17 @@ export default class PietUI {
       writeButton.trigger('click');
     });
 
+    const forwardButton = $('#grid-forward');
+    const backwardButton = $('#grid-backward');
+    forwardButton.on('click', () => {
+      this.edit.forward = true;
+      this.edit.selectColor(this.edit.color);
+    });
+    backwardButton.on('click', () => {
+      this.edit.forward = false;
+      this.edit.selectColor(this.edit.color);
+    });
+
     this.export = {
       pngButton: $('#export-png'),
       svgButton: $('#export-svg'),
