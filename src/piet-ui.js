@@ -277,11 +277,11 @@ export default class PietUI {
     const backwardButton = $('#grid-backward');
     forwardButton.on('click', () => {
       this.edit.forward = true;
-      this.edit.selectColor(this.edit.color);
+      this.edit.updateColor(this.edit.color);
     });
     backwardButton.on('click', () => {
       this.edit.forward = false;
-      this.edit.selectColor(this.edit.color);
+      this.edit.updateColor(this.edit.color);
     });
 
     this.export = {
